@@ -1,0 +1,23 @@
+{
+  "name": "ecstatic",
+  "version": "0.0.0",
+  "description": "Static isomorphic blog generator.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react",
+    "isomorphic",
+    "static",
+    "blog"
+  ],
+  "author": "Ryan Ashcraft",
+  "license": "MIT",
+  "dependencies": {
+    "react": "~0.12.2"
+  },
+  "devDependencies": {
+    "gulp": "~3.8.10"
+  }
+}
