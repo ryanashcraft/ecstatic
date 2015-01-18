@@ -4,11 +4,25 @@ var path = require('path');
 var through = require('through2');
 var gutil = require('gulp-util');
 var json3 = require('json3');
+var toml = require('toml');
 var PluginError = gutil.PluginError;
 var React = require('react/addons');
 var Bootstrap = require('./components/Bootstrap');
 
 var PLUGIN_NAME = 'ecstatic';
+
+function parse(file) {
+    var extension = path.extname(file.path);
+
+    switch(extension) {
+        case '.json':
+            return json3.parse(file.contents.toString());
+        case '.toml':
+            return toml.parse(file.contents.toString());
+        default:
+            throw new Error('Unsupported extension ' + extension);
+    }
+}
 
 function Ecstatic(options) {
     return through.obj(function(file, enc, cb) {
@@ -17,12 +31,12 @@ function Ecstatic(options) {
         }
 
         if (file.isBuffer()) {
-            var contents = file.contents.toString();
             var parsed;
+
             try {
-                parsed = json3.parse(contents);
+                parsed = parse(file);
             } catch (e) {
-                cb(new gutil.PluginError(PLUGIN_NAME, 'Failed to parse ' + file.relative));
+                cb(new gutil.PluginError(PLUGIN_NAME, 'Failed to parse ' + file.relative + ' (' + e.message + ')'));
                 return;
             }
 
