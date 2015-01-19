@@ -19,8 +19,9 @@ function addMetaData(basePath, groupName) {
             headMetaData = new Buffer('[[' + groupName + ']]\r\n');
         }
 
-        var tailMetaData = new Buffer('\r\npath = "' + relativePathWithoutExtension + '"');
-        file.contents = Buffer.concat([headMetaData, file.contents, tailMetaData]);
+        var data = json3.parse(file.contents.toString());
+        data.path = relativePathWithoutExtension;
+        file.contents = new Buffer(json3.stringify(data));
         cb(null, file);
     });
 }
