@@ -8,7 +8,7 @@ var parse = require('./parse');
 
 var PLUGIN_NAME = 'ecstatic';
 
-function Sort(sortFunction, outputName) {
+function Group(groupFunction) {
     return through.obj(function(file, enc, cb) {
         var parsed;
 
@@ -18,12 +18,15 @@ function Sort(sortFunction, outputName) {
             cb(new gutil.PluginError(PLUGIN_NAME, 'Failed to parse ' + file.relative + ' (' + e.message + ')'));
         }
 
-        var sortedFiles = sortFunction(parsed);
+        var groups = groupFunction(parsed, file.path);
 
-        file.path = path.join(file.base, outputName);
-        file.contents = new Buffer(json3.stringify(sortedFiles));
-        cb(null, file)
+        groups.forEach(function forEachGroup(group, i) {
+            var groupFile = file.clone();
+            groupFile.path = group.path + '.json';
+            groupFile.contents = new Buffer(json3.stringify(group));
+            this.push(groupFile);
+        }.bind(this));
     });
 }
 
-module.exports = Sort;
+module.exports = Group;
