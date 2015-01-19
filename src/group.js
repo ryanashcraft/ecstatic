@@ -1,32 +1,36 @@
 'use strict';
 
 var path = require('path');
-var through = require('through2');
+var through = require('through');
 var gutil = require('gulp-util');
 var json3 = require('json3');
 var parse = require('./parse');
 
 var PLUGIN_NAME = 'ecstatic';
 
-function Group(groupFunction) {
-    return through.obj(function(file, enc, cb) {
-        var parsed;
+function Group(name, groupFunction) {
+    var data = [];
+    var firstFile;
 
-        try {
-            parsed = parse(file);
-        } catch (e) {
-            cb(new gutil.PluginError(PLUGIN_NAME, 'Failed to parse ' + file.relative + ' (' + e.message + ')'));
+    function processEndStream() {
+        var groups = groupFunction(data, firstFile);
+
+        groups.forEach(function forEachGroup(group) {
+            this.push(group);
+        }.bind(this));
+    }
+
+    function processFile(file) {
+        if (!firstFile) {
+            firstFile = file;
+            var transformedPath = [path.dirname(file.path), name + '.json'].join(path.sep);
+            firstFile.path = transformedPath;
         }
 
-        var groups = groupFunction(parsed, file.path);
+        data.push(json3.parse(file.contents.toString()));
+    }
 
-        groups.forEach(function forEachGroup(group, i) {
-            var groupFile = file.clone();
-            groupFile.path = group.path + '.json';
-            groupFile.contents = new Buffer(json3.stringify(group));
-            this.push(groupFile);
-        }.bind(this));
-    });
+    return through(processFile, processEndStream)
 }
 
 module.exports = Group;
