@@ -14,7 +14,6 @@ function normalize() {
         file.contents = new Buffer(json3.stringify(data));
         var transformedPath = [path.dirname(file.path), path.basename(file.path, path.extname(file.path)) + '.json'].join(path.sep);
         file.path = transformedPath;
-
         cb(null, file);
     });
 }
