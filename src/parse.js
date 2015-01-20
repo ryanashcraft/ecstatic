@@ -4,6 +4,7 @@ var path = require('path');
 var json3 = require('json3');
 var toml = require('toml');
 var yaml = require('js-yaml');
+var _ = require('lodash');
 
 function parse(file) {
     var extension = path.extname(file.path);
@@ -15,13 +16,18 @@ function parse(file) {
             return toml.parse(file.contents.toString());
         case '.md':
         case '.markdown':
-            return parseMarkdown(file);
+            return parseWithYamlFrontMatter(file);
+        case '.html':
+            var data = parseWithYamlFrontMatter(file);
+            data.html = _.escape(data.body);
+            delete data.body;
+            return data;
         default:
             throw new Error('Unsupported extension ' + extension);
     }
 }
 
-function parseMarkdown(file) {
+function parseWithYamlFrontMatter(file) {
     var s = file.contents.toString();
     var delimeter = '---';
     var frontMatterStartDelIndex = s.indexOf(delimeter);
