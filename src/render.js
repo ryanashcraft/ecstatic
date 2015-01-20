@@ -35,9 +35,7 @@ function Render(options) {
                             relativePath: relativePath
                         }
                     },
-                    global: {
-                        $set: options.globalProps || {}
-                    }
+                    $merge: options.props || {}
                 }
             );
 
