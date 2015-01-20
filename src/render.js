@@ -26,7 +26,7 @@ function Render(options) {
                 return;
             }
 
-            var relativePath = path.dirname(file.relative);
+            var relativePath = path.dirname(parsed.path);
             var props = React.addons.update(
                 parsed,
                 {
