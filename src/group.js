@@ -15,9 +15,13 @@ function Group(name, groupFunction) {
     function processEndStream() {
         var groups = groupFunction(data, firstFile);
 
-        groups.forEach(function forEachGroup(group) {
-            this.push(group);
-        }.bind(this));
+        if (Array.isArray(groups)) {
+            groups.forEach(function forEachGroup(group) {
+                this.push(group);
+            }.bind(this));
+        } else {
+            this.push(groups);
+        }
     }
 
     function processFile(file) {
